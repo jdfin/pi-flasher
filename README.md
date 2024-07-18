@@ -12,6 +12,14 @@ Powering it from the Pi might depend on having a good 5V supply.
 A breadboarded one (running with a pi5) is shown in
 [pi-flasher.jpg](pi-flasher.jpg).
 
+Basically, a Raspberry Pi uses a pair of MCP23S17s as GPIO expanders, and those
+drive the flash chip's address, data, and control pins. All hardware except the
+Pi runs at 5V; there is a 74AHCT125 used for high-speed 3.3V -> 5V translation,
+and a voltage divider for 5V -> 3.3V translation. The bidirectional level
+shifters like you use for I2C didn't work at high speeds for SPI. The idea for
+using the 74AHCT125 for level shifting came from Adafruit
+([they sell them](https://www.adafruit.com/product/1787) for that purpose).
+
 # Software
 
 Starting with a newly-flashed Raspberry Pi:
@@ -42,3 +50,12 @@ Multiple arguments work in a logical order, e.g.
 ./flash -c -p my_image.ihx -d 0 -l 512
 ```
 will erase the chip, program the file, then dump.
+
+# Pieces
+
+Perhaps-interesting pieces if you don't care about programming flash:
+- example of SPI from a Raspberry Pi
+- example of 5V GPIO with the 3.3V Pi
+- using an MCP23S17 for Pi GPIO expansion
+  - this has worked with the I2C version of the chip; hence the Mcp23x17Bus and Mc23x17Spi classes
+- reading an "Intel" hex file
