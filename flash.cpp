@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <cstdint>
 #include <cstdio>
@@ -8,32 +7,16 @@
 #include "flash.h"
 
 
-void Flash::read(uint32_t adrs, uint8_t *buf, int len)
+Flash::Flash(Control& ctrl, ABus& abus, DBus& dbus) :
+    _ctrl(ctrl),
+    _abus(abus),
+    _dbus(dbus)
 {
-    _dbus.input();
-
-    _ctrl.ce_oe_we(0, 0, 1);
-    while (len-- > 0) {
-        _abus.set(adrs++);
-        *buf = _dbus.get();
-    }
-    _ctrl.ce_oe_we(1, 1, 1);
 }
 
 
-void Flash::write(uint32_t adrs, uint8_t *buf, int len)
+Flash::~Flash()
 {
-    _ctrl.ce_oe_we(0, 1, 1);
-
-    while (len-- > 0) {
-        _abus.set(adrs++);
-        _dbus.set(*buf++);
-        _ctrl.ce_oe_we(0, 1, 0);
-        _ctrl.ce_oe_we(0, 1, 1);
-    }
-    _ctrl.ce_oe_we(1, 1, 1);
-
-    _dbus.input();
 }
 
 
@@ -62,19 +45,6 @@ void Flash::dump(uint32_t adrs, int len)
     _ctrl.ce_oe_we(1, 1, 1);
 
     printf("\n");
-}
-
-
-Flash::Flash(Control& ctrl, ABus& abus, DBus& dbus) :
-    _ctrl(ctrl),
-    _abus(abus),
-    _dbus(dbus)
-{
-}
-
-
-Flash::~Flash()
-{
 }
 
 
@@ -127,4 +97,35 @@ void Flash::erase_chip()
     write(0x2aaa, 0x55);
     write(0x5555, 0x10);
     usleep(t_sce_us);
+}
+
+
+uint8_t Flash::read(uint32_t adrs)
+{
+    _dbus.input();
+
+    _ctrl.ce_oe_we(0, 0, 1);
+
+    _abus.set(adrs);
+    uint8_t data = _dbus.get();
+
+    _ctrl.ce_oe_we(1, 1, 1);
+
+    return data;
+}
+
+
+void Flash::write(uint32_t adrs, uint8_t data)
+{
+    _ctrl.ce_oe_we(0, 1, 1);
+
+    _abus.set(adrs);
+    _dbus.set(data);
+
+    _ctrl.ce_oe_we(0, 1, 0);
+    _ctrl.ce_oe_we(0, 1, 1);
+
+    _ctrl.ce_oe_we(1, 1, 1);
+
+    _dbus.input();
 }

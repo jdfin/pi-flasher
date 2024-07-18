@@ -1,5 +1,4 @@
 #include <cstdint>
-#include <cstdio>
 #include "spi_dev.h"
 #include "mcp23x17_spi.h"
 
@@ -24,8 +23,6 @@ void Mcp23x17Spi::write_reg(uint8_t reg, uint16_t val)
     // val bits 0..7 are port A and go to reg;
     // bits 8..15 are port B and go to reg + 1
 
-    //printf("write_reg(%d): reg=0x%02x val=0x%04x\n", _spi_adr, reg, val);
-
     // don't assume an endian
     uint8_t buf[4] = {
         uint8_t(_spi_adr << 1),
@@ -35,8 +32,6 @@ void Mcp23x17Spi::write_reg(uint8_t reg, uint16_t val)
     };
 
     _spi_dev.xfer(buf, buf, 4);
-
-    _write_count++;
 }
 
 
@@ -58,8 +53,4 @@ void Mcp23x17Spi::read_reg(uint8_t reg, uint16_t& val)
 
     // don't assume an endian
     val = (uint16_t(buf[3]) << 8) | uint16_t(buf[2]);
-
-    //printf("read_reg(%d): reg=0x%02x val=0x%04x\n", _spi_adr, reg, val);
-
-    _read_count++;
 }

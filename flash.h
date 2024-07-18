@@ -16,22 +16,6 @@ class Flash
 
         virtual ~Flash();
 
-        void read(uint32_t adrs, uint8_t *buf, int len);
-
-        uint8_t read(uint32_t adrs)
-        {
-            uint8_t data;
-            read(adrs, &data, 1);
-            return data;
-        }
-
-        void write(uint32_t adrs, uint8_t *buf, int len);
-
-        void write(uint32_t adrs, uint8_t data)
-        {
-            write(adrs, &data, 1);
-        }
-
         void dump(uint32_t adrs, int len);
 
         void get_id(uint8_t& mfg, uint8_t& dev);
@@ -55,5 +39,9 @@ class Flash
         Control& _ctrl;
         ABus& _abus;
         DBus& _dbus;
+
+        uint8_t read(uint32_t adrs);
+
+        void write(uint32_t adrs, uint8_t data);
 
 }; // class Flash

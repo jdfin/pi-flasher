@@ -1,5 +1,4 @@
-#include <unistd.h> // getopt
-#include <cassert>
+#include <unistd.h>
 #include <cstdint>
 #include <cstring>
 #include <cstdlib>
@@ -113,7 +112,7 @@ int main(int argc, char *argv[])
         while (true) {
             uint16_t adrs;
             int len;
-            if (read_line(fp, buf, buf_len, adrs, len) != 0x00)
+            if (!read_record(fp, buf, buf_len, adrs, len))
                 break;
             printf("adrs=%04x len=%02x:", adrs, len);
             for (int i = 0; i < len; i++)
